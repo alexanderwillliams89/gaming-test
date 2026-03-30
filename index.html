@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Ping Tester</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0f172a; color: #f8fafc; padding: 50px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155; }
+        h2 { color: #38bdf8; margin-bottom: 10px; }
+        #result { margin-top: 25px; font-size: 1.4rem; font-weight: bold; min-height: 60px; }
+        button { padding: 12px 25px; border-radius: 8px; border: none; background: #38bdf8; color: #0f172a; cursor: pointer; font-weight: 800; transition: 0.2s; }
+        button:hover { background: #7dd3fc; transform: scale(1.05); }
+        .strong { color: #4ade80; } 
+        .fair { color: #fbbf24; }   
+        .weak { color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>🎮 Gaming Network Test</h2>
+        <p>Testing connection to Google's Servers...</p>
+        <button onclick="pingTest()">Start Test</button>
+        
+        <div id="result">Ready</div>
+    </div>
+
+    <script>
+        function pingTest() {
+            const display = document.getElementById('result');
+            display.innerHTML = "Testing... ⏳";
+
+            // We use a tiny 1x1 pixel image from Google to bypass security blocks
+            const img = new Image();
+            const start = Date.now();
+            
+            // Add a random number to the URL to prevent the browser from "cheating" with cache
+            img.src = "https://www.google.com/images/phd/px.gif?cache=" + start;
+
+            img.onload = function() {
+                const duration = Date.now() - start;
+                updateUI(duration);
+            };
+
+            img.onerror = function() {
+                // If Google blocks it, we try an alternative (Cloudflare)
+                const img2 = new Image();
+                const start2 = Date.now();
+                img2.src = "https://cloudflare.com/favicon.ico?cache=" + start2;
+                
+                img2.onload = function() {
+                    updateUI(Date.now() - start2);
+                };
+                img2.onerror = () => display.innerHTML = "❌ Connection Failed";
+            };
+        }
+
+        function updateUI(duration) {
+            const display = document.getElementById('result');
+            let status = "";
+            let cssClass = "";
+
+            if (duration < 60) {
+                status = "ULTRA FAST (Pro Gaming)";
+                cssClass = "strong";
+            } else if (duration < 150) {
+                status = "GOOD (Playable)";
+                cssClass = "fair";
+            } else {
+                status = "LAGGY (Weak Connection)";
+                cssClass = "weak";
+            }
+
+            display.innerHTML = `Ping: <span class="${cssClass}">${duration}ms</span><br>${status}`;
+        }
+    </script>
+</body>
+</html>
